@@ -1,0 +1,46 @@
+# Build and target artifacts
+target/
+*.class
+*.jar
+*.war
+*.ear
+
+# Maven
+.mvn/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+
+# IDEs
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+.project
+.classpath
+.settings/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+env/
+*.egg-info/
+dist/
+build/
+
+# Checkpoints and persistent volumes
+checkpoints/
+savepoints/
+rocksdb-data/
+logs/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
