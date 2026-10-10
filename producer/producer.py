@@ -132,7 +132,7 @@ def run_inject_late(producer, skew_seconds=45, count=3):
 
     for i in range(count):
         tx = generate_transaction(
-            account_id="ACC_LATE_TEST",
+            account_id=f"ACC_LATE_{i % 2}",
             amount=150.0 + (i * 10),
             event_time=late_time,
             category="RETAIL",
@@ -232,10 +232,10 @@ def run_demo(producer, bootstrap_servers):
 
     # Step 5: Advance Watermark with In-Order Heartbeats
     logger.info("\n--- STEP 5: Advancing Pipeline Watermarks ---")
-    for _ in range(15):
-        tx = generate_transaction(account_id="ACC_WATERMARK_SYNC", amount=25.0)
+    for i in range(25):
+        tx = generate_transaction(account_id=f"ACC_SYNC_{i % 2}", amount=25.0)
         producer.send(TOPIC_TRANSACTIONS, key=tx["account_id"], value=tx)
-        time.sleep(0.5)
+        time.sleep(0.3)
     producer.flush()
 
     # Step 6: Inject Late-Arriving Data into Watermarked Pipeline

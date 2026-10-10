@@ -68,9 +68,24 @@ services:
     networks:
       - fraud-net
 
+  volume-init:
+    image: apache/flink:1.19.0-java17
+    container_name: fraud-engine-volume-init
+    user: "0:0"
+    command: >
+      bash -c "mkdir -p /opt/flink/checkpoints /opt/flink/savepoints && chown -R 9999:9999 /opt/flink/checkpoints /opt/flink/savepoints && chmod -R 777 /opt/flink/checkpoints /opt/flink/savepoints"
+    volumes:
+      - flink-checkpoints:/opt/flink/checkpoints
+      - flink-savepoints:/opt/flink/savepoints
+    networks:
+      - fraud-net
+
   jobmanager:
     image: apache/flink:1.19.0-java17
     container_name: fraud-engine-jobmanager
+    depends_on:
+      volume-init:
+        condition: service_completed_successfully
     ports:
       - "8088:8081"
     command: jobmanager
@@ -99,7 +114,10 @@ services:
     image: apache/flink:1.19.0-java17
     container_name: fraud-engine-taskmanager
     depends_on:
-      - jobmanager
+      volume-init:
+        condition: service_completed_successfully
+      jobmanager:
+        condition: service_started
     command: taskmanager
     environment:
       - |

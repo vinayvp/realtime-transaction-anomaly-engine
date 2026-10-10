@@ -71,15 +71,12 @@ public class AnomalyEngineApp {
         WatermarkStrategy<Transaction> watermarkStrategy = WatermarkStrategy
                 .<Transaction>forBoundedOutOfOrderness(Duration.ofSeconds(JobConfig.WATERMARK_OUT_OF_ORDERNESS_SEC))
                 .withTimestampAssigner((tx, recordTimestamp) -> tx.getEventTime())
-                .withIdleness(Duration.ofSeconds(JobConfig.WATERMARK_IDLENESS_SEC));
+                .withIdleness(Duration.ofSeconds(1));
 
         DataStream<Transaction> transactionStream = env
                 .fromSource(transactionSource, watermarkStrategy, "KafkaTransactionsSource")
                 .name("KafkaTransactionsSource")
-                .uid("kafka-transactions-source")
-                .filter(Objects::nonNull)
-                .name("FilterNullTransactions")
-                .uid("filter-null-transactions");
+                .uid("kafka-transactions-source");
 
         // 3. Dynamic Rules Control Stream (Broadcast to all subtasks)
         LOG.info("Setting up Kafka fraud-rules control source on topic '{}'...", JobConfig.TOPIC_FRAUD_RULES);
@@ -91,13 +88,14 @@ public class AnomalyEngineApp {
                 .setValueOnlyDeserializer(new JsonDeserializationSchema<>(Rule.class))
                 .build();
 
+        WatermarkStrategy<Rule> ruleWatermarkStrategy = WatermarkStrategy
+                .<Rule>noWatermarks()
+                .withIdleness(Duration.ofSeconds(1));
+
         DataStream<Rule> ruleStream = env
-                .fromSource(ruleSource, WatermarkStrategy.noWatermarks(), "KafkaFraudRulesSource")
+                .fromSource(ruleSource, ruleWatermarkStrategy, "KafkaFraudRulesSource")
                 .name("KafkaFraudRulesSource")
-                .uid("kafka-fraud-rules-source")
-                .filter(Objects::nonNull)
-                .name("FilterNullRules")
-                .uid("filter-null-rules");
+                .uid("kafka-fraud-rules-source");
 
         BroadcastStream<Rule> broadcastRulesStream = ruleStream.broadcast(DynamicFraudRuleEvaluator.RULES_DESCRIPTOR);
 

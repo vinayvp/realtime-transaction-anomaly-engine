@@ -85,6 +85,9 @@ public class DynamicFraudRuleEvaluator
         Long eventTimestamp = ctx.timestamp();
         long txTime = (eventTimestamp != null) ? eventTimestamp : (tx.getEventTime() != null ? tx.getEventTime() : 0L);
 
+        LOG.info("PROCESS TX -> id: {}, eventTime: {}, currentWatermark: {}",
+                tx.getTransactionId(), eventTimestamp, currentWatermark);
+
         if (eventTimestamp != null && eventTimestamp < currentWatermark) {
             LOG.warn("LATE RECORD DETECTED -> txId: {}, eventTime: {}, watermark: {}. Routing to SideOutput DLQ.",
                     tx.getTransactionId(), eventTimestamp, currentWatermark);
