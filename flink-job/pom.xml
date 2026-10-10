@@ -16,7 +16,7 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <flink.version>1.19.0</flink.version>
-        <flink.kafka.connector.version>3.1.0-1.19</flink.kafka.connector.version>
+        <flink.kafka.connector.version>3.3.0-1.19</flink.kafka.connector.version>
         <jackson.version>2.16.1</jackson.version>
         <slf4j.version>2.0.12</slf4j.version>
         <logback.version>1.4.14</logback.version>
@@ -40,6 +40,11 @@
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-connector-kafka</artifactId>
             <version>${flink.kafka.connector.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-connector-base</artifactId>
+            <version>${flink.version}</version>
         </dependency>
 
         <!-- RocksDB State Backend -->
